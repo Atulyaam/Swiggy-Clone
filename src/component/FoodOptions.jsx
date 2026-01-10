@@ -2,7 +2,6 @@ import { imageGridCards } from "../Utils/FoodData";
 import FoodCard from "./FoodCard";
 
 export default function FoodOption() {
-  console.log(imageGridCards);
   return (
     <>
       <div className="w-[80%] container mx-auto flex flex-wrap my-20">
