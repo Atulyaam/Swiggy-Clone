@@ -1,26 +1,16 @@
 import { useEffect, useState } from "react";
 import RestCard from "./RestCard";
 import Simmor from "./Simmer";
+import { dineoutRestaurants } from "../Utils/RestaurentData.js";
 
 export default function Restaurent() {
   const [Restdata, setRestdata] = useState([]);
 
   useEffect(() => {
-    async function fetchdata() {
-      const proxyServer = "https://cors-anywhere.herokuapp.com/";
-
-      const url =
-        "https://www.swiggy.com/dapi/restaurants/list/v5?lat=19.0748&lng=72.8856&is-seo-homepage-enabled=true&page_type=DESKTOP_WEB_LISTING";
-
-      const response = await fetch(proxyServer + url);
-      const data = await response.json();
-      const restaurants =
-        data?.data?.cards?.[1]?.card?.card?.gridElements?.infoWithStyle
-          ?.restaurants || [];
-
-      setRestdata(restaurants);
-    }
-    fetchdata();
+    // Simulate network delay to show shimmer effect
+    setTimeout(() => {
+      setRestdata(dineoutRestaurants);
+    }, 1000);
   }, []);
 
   if (Restdata.length === 0) return <Simmor></Simmor>;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { MenuInfo } from "../Utils/FaultyApi.js";
 import RestInfo from "./RestInfo";
@@ -6,7 +6,6 @@ import RestInfo from "./RestInfo";
 export default function SearchFood() {
   const [food, setFood] = useState("");
   const [RestData, setRestData] = useState([]);
-  const [filteredFood, setFilteredFood] = useState([]);
 
   const { id } = useParams();
 
@@ -22,30 +21,31 @@ export default function SearchFood() {
     fetchData();
   }, [id]);
 
-  useEffect(() => {
-    if (food.trim() === "") {
-      setFilteredFood([]);
-      return;
-    }
-
+  const filteredFood = useMemo(() => {
     const searchResults = [];
     const addedIds = new Set();
 
-    RestData.forEach((menuSection) => {
-      const items = menuSection?.card?.card?.itemCards;
-      if (items) {
-        items.forEach((item) => {
-          const itemName = item?.card?.info?.name?.toLowerCase();
-          const itemId = item?.card?.info?.id;
+    if (food.trim() !== "") {
+      RestData.forEach((menuSection) => {
+        const items = menuSection?.card?.card?.itemCards;
+        if (items) {
+          items.forEach((item) => {
+            const itemName = item?.card?.info?.name?.toLowerCase();
+            const itemId = item?.card?.info?.id;
 
-          if (itemName?.includes(food.toLowerCase()) && !addedIds.has(itemId)) {
-            searchResults.push(item.card.info);
-            addedIds.add(itemId);
-          }
-        });
-      }
-    });
-    setFilteredFood(searchResults);
+            if (
+              itemName?.includes(food.toLowerCase()) &&
+              !addedIds.has(itemId)
+            ) {
+              searchResults.push(item.card.info);
+              addedIds.add(itemId);
+            }
+          });
+        }
+      });
+    }
+
+    return searchResults;
   }, [food, RestData]);
 
   return (

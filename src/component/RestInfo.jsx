@@ -1,5 +1,34 @@
-export default function RestInfo({restData}){
-  
+import { useCallback } from "react";
+import {
+  addItems,
+  IncrementItems,
+  DecrementItmes,
+} from "../../Stores/cardSlicer.jsx";
+
+import { useDispatch, useSelector, shallowEqual } from "react-redux";
+
+export default function RestInfo({ restData }) {
+  const dispatch = useDispatch();
+  const itemId = String(restData?.id);
+
+  // Get the entire items array - this will trigger re-render on any change
+  const cartItems = useSelector((state) => state.cartSlice.items, shallowEqual);
+
+  // Calculate count from the current cartItems
+  const count =
+    cartItems.find((item) => String(item.id) === itemId)?.quantity || 0;
+
+  const handelAddItem = useCallback(() => {
+    dispatch(addItems({ ...restData, id: itemId }));
+  }, [itemId, restData, dispatch]);
+
+  const handelePlus = useCallback(() => {
+    dispatch(IncrementItems({ id: itemId }));
+  }, [itemId, dispatch]);
+
+  const handelMinus = useCallback(() => {
+    dispatch(DecrementItmes({ id: itemId }));
+  }, [itemId, dispatch]);
 
   return (
     <>
@@ -19,7 +48,8 @@ export default function RestInfo({restData}){
 
           <p>{restData?.description}</p>
         </div>
-        <div className="w-[20%] relative">
+
+        <div className="w-[20%] relative h-42">
           <img
             className="w-full h-36 object-cover rounded-2xl"
             src={
@@ -28,14 +58,39 @@ export default function RestInfo({restData}){
             }
             alt=""
           />
-          <button className="absolute bottom-1 left-20 rounded-xl text-2xl text-green-600  px-4 py-2 shadow-md border-white bg-white ">
-            ADD
-          </button>
+
+          {count === 0 ? (
+            <button
+              onClick={() => {
+                handelAddItem();
+              }}
+              className="absolute bottom-1 left-20 rounded-xl text-2xl text-green-600  px-4 py-2 shadow-md border-white bg-white "
+            >
+              ADD
+            </button>
+          ) : (
+            <div className="absolute bottom-1 left-20 flex gap-3 text-2xl text-green-600 px-6 py-2 shadow-md border border-white bg-white rounded-2xl">
+              <button
+                onClick={() => {
+                  handelePlus();
+                }}
+              >
+                +
+              </button>
+              <span>{count}</span>
+              <button
+                onClick={() => {
+                  handelMinus();
+                }}
+              >
+                -
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
       <hr className="mb-6 mt-2"></hr>
     </>
   );
-
 }
